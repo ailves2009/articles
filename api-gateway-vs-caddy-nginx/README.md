@@ -8,7 +8,7 @@
 
 **Status:** reference architecture with examples. The Terraform passes `terraform validate` and `tflint` but has not been deployed. The Caddyfile and policies have not been run; the commands to check them are below.
 
-Article on Medium: *link*
+Article on Medium: [API Gateway vs Caddy/Nginx: Security and Reliability in the Age of AI](https://alexanderilves.medium.com/api-gateway-vs-caddy-security-and-reliability-in-modern-web-application-development-7652847cd43b)
 
 ---
 
