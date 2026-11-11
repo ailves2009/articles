@@ -1,0 +1,37 @@
+# Simple-project edge: Caddy as a private origin behind CloudFront + AWS WAF.
+# Not validated in this repo yet: run `caddy validate --config Caddyfile` before use.
+{
+	admin localhost:2019 # default; never expose the admin API
+	metrics # Prometheus metrics on the admin endpoint
+}
+
+api.example.com {
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		-Server
+	}
+
+	handle /healthz {
+		respond "ok" 200
+	}
+
+	handle {
+		# Caddy has no built-in JWT validation: delegate authentication to an OIDC proxy.
+		forward_auth oauth2-proxy:4180 {
+			uri /oauth2/auth
+			copy_headers X-Auth-Request-User X-Auth-Request-Email
+		}
+		# Canary 90/10 between two versions, with active health checks.
+		reverse_proxy app-blue:8080 app-green:8080 {
+			lb_policy weighted_round_robin 9 1
+			health_uri /healthz
+			health_interval 10s
+		}
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}
